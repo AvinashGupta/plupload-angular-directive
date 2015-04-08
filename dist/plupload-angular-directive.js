@@ -85,7 +85,7 @@ angular.module('plupload.directive', [])
 				var options = {
 					runtimes : 'html5,flash,silverlight',
 						browse_button : iAttrs.id,
-						multi_selection: true,
+						multi_selection: false,
 				//		container : 'abc',
 						max_file_size : iAttrs.plMaxFileSize,
 						url : iAttrs.plUrl,
