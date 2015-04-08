@@ -40,7 +40,7 @@ angular.module('plupload.directive', [])
 				'plInstance': '='
 			},
 			link: function (scope, iElement, iAttrs) {
-
+				var additionalDataToUpload;
 				scope.randomString = function(len, charSet) {
 					charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 					var randomString = '';
@@ -49,6 +49,10 @@ angular.module('plupload.directive', [])
 						randomString += charSet.substring(randomPoz,randomPoz+1);
 					}
 					return randomString;
+				}
+
+				if(iAttrs.plFilesModel) {
+					scope.plFilesModel.startUpload=FileUploaded
 				}
 
 				if(!iAttrs.id){
@@ -183,9 +187,31 @@ angular.module('plupload.directive', [])
 					}
 				});
 
+				uploader.bind('BeforeUpload', function (up, file) {
+				    if(!additionalDataToUpload) return;
+
+				    if(typeof additionalDataToUpload == 'object'){
+				    	up.settings.multipart_params = {};
+				    	for(var key in additionalDataToUpload){
+				    		if(typeof additionalDataToUpload[key] == 'object'){
+				    			up.settings.multipart_params[key] = JSON.stringify(additionalDataToUpload[key]);
+				    		}else{
+				    			up.settings.multipart_params[key] = additionalDataToUpload[key];
+				    		}
+				    	}
+				    }else{
+				    	up.settings.multipart_params = additionalDataToUpload;
+				    }
+				});
+
 				if(iAttrs.plInstance){
 					scope.plInstance = uploader;	
 				}
+
+				function FileUploaded(data){
+					additionalDataToUpload = data;
+					uploader.start();
+				};
 
 				// scope.upload = function(){
 				// 	uploader.start();
